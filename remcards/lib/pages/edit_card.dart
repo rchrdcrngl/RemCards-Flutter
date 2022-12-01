@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:remcards/const.dart';
-import 'components/AppBar.dart';
-import 'components/RemCard.dart';
-import 'components/RequestHeader.dart';
-import 'components/RoundedTextField.dart';
+import 'components/app_bar.dart';
+import 'components/remcard.dart';
+import 'components/request_header.dart';
+import 'components/rounded_text_field.dart';
 
 const Map<String, int> tskLevelMapFromString = {'Normal':0, 'Needs Action': 1, 'Urgent': 2};
 const Map<int, String> tskLevelMapFromInt = {0:'Normal', 1:'Needs Action', 2:'Urgent'};

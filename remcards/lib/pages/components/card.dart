@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:remcards/pages/components/RemCard.dart';
-import '../EditCard.dart';
+import 'package:remcards/pages/components/remcard.dart';
+import '../edit_card.dart';
 
 
 //============ values ================================

@@ -5,7 +5,7 @@ import 'package:remcards/const.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../const.dart';
 import 'package:get/get.dart';
-import 'components/RoundedTextField.dart';
+import 'components/rounded_text_field.dart';
 
 class RegisterPage extends StatefulWidget {
   @override

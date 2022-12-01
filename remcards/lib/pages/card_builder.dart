@@ -6,38 +6,44 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:remcards/const.dart';
-import 'package:remcards/pages/components/Card.dart';
-import 'package:remcards/pages/components/RequestHeader.dart';
-import 'package:remcards/pages/components/SessionHandler.dart';
-import 'package:remcards/pages/components/CardFunctions.dart';
+import 'package:remcards/pages/components/card.dart';
+import 'package:remcards/pages/components/request_header.dart';
+import 'package:remcards/pages/components/session_handler.dart';
+import 'package:remcards/pages/components/card_functions.dart';
 import 'package:remcards/pages/login.dart';
-import 'components/AppBar.dart';
-import 'components/RemCard.dart';
+import 'components/app_bar.dart';
+import 'components/remcard.dart';
 
 
 //======================= builder ===========
-class cardBuilder2 extends StatefulWidget {
+class CardBuilder extends StatefulWidget {
   final bool isRefresh;
 
-  const cardBuilder2({Key key, this.isRefresh = false}) : super(key: key);
+  const CardBuilder({Key key, this.isRefresh = false}) : super(key: key);
 
-  static _cardBuilder2State of(BuildContext context) =>
-      context.findAncestorStateOfType<_cardBuilder2State>();
+  static _CardBuilderState of(BuildContext context) =>
+      context.findAncestorStateOfType<_CardBuilderState>();
   @override
-  _cardBuilder2State createState() => new _cardBuilder2State();
+  _CardBuilderState createState() => new _CardBuilderState();
 }
 
-class _cardBuilder2State extends State<cardBuilder2> {
-  StreamController _cardController;
+class _CardBuilderState extends State<CardBuilder> {
+  Future<List<RemCard>> data;
   bool isUpdated = false;
   bool fetchError = false;
   bool unauthorized = false;
-  refresh() => _refresh();
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
   int count = 1;
 
-  Future fetchData([howMany = 5]) async {
+  @override
+  void initState(){
+    super.initState();
+    data = fetchData();
+    showSnack('redraw card builder');
+  }
+
+  Future<List<RemCard>> fetchData([howMany = 5]) async {
     var cacheExists = await APICacheManager().isAPICacheKeyExist("API-Cards");
     if (!cacheExists) {
       final headers = await getRequestHeaders();
@@ -45,11 +51,12 @@ class _cardBuilder2State extends State<cardBuilder2> {
 
       if (response.statusCode == 200) {
         APICacheDBModel cacheDBModel =
-            new APICacheDBModel(key: "API-Cards", syncData: response.body);
+        new APICacheDBModel(key: "API-Cards", syncData: response.body);
 
         await APICacheManager().addCacheData(cacheDBModel);
 
         List jsonResponse = json.decode(response.body);
+        showSnack('fetching fresh data');
         return jsonResponse.map((card) => new RemCard.fromJson(card)).toList();
       } else if (response.statusCode == 401) {
         invalidateSession();
@@ -62,54 +69,36 @@ class _cardBuilder2State extends State<cardBuilder2> {
         });
         throw Exception('Failed to load RemCards');
       }
-    } else {
-      var cacheData = await APICacheManager().getCacheData("API-Cards");
-
-      List jsonResponse = json.decode(cacheData.syncData);
-      return jsonResponse.map((card) => new RemCard.fromJson(card)).toList();
+      return [];
     }
+    var cacheData = await APICacheManager().getCacheData("API-Cards");
+    List jsonResponse = json.decode(cacheData.syncData);
+    return jsonResponse.map((card) => new RemCard.fromJson(card)).toList();
   }
-  
+
 
   parseData() async {
     fetchData().then((res) async {
-      _cardController.add(res);
       return res;
     });
   }
 
   showSnack(String message) {
-    return scaffoldKey.currentState.showSnackBar(
+    return ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
       ),
     );
   }
 
+  refresh() => _refresh();
+
   void _refresh() {
-    setState(() {
-      _handleRefresh();
-    });
-  }
-
-  Future<Null> _handleRefresh() async {
-    count++;
-    print("Refresh: ${count}");
     APICacheManager().deleteCache("API-Cards");
-    fetchData(count * 5).then((res) async {
-      _cardController.add(res);
-      return null;
+    setState(() {
+      data = fetchData();
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _cardController = new StreamController();
-    parseData();
-    if (widget.isRefresh) {
-      refresh();
-    }
+    showSnack('REFRESHING DATA');
   }
 
   @override
@@ -126,8 +115,8 @@ class _cardBuilder2State extends State<cardBuilder2> {
         backgroundColor: Colors.white,
         body: Container(
           padding: EdgeInsets.only(left: 10.0, right: 10.0),
-          child: StreamBuilder(
-            stream: _cardController.stream,
+          child: FutureBuilder<List<RemCard>>(
+            future: data,
             builder: (context, snapshot) {
               if ((snapshot.hasData) && ((snapshot.data).isEmpty)) {
                 return Center(
@@ -156,19 +145,19 @@ class _cardBuilder2State extends State<cardBuilder2> {
         ));
   }
 
-  
+
 
   ListView _cardBuilder(data) {
     return ListView.builder(
         itemCount: data.length,
         itemBuilder: (context, index) {
           return RCard(
-                remcard: data[index],
-                deleteCard: deleteCard,
-                refresh: refresh,
-                incrementStatus: incrementStatus,
-                context: context,
-              );
+            remcard: data[index],
+            deleteCard: deleteCard,
+            refresh: refresh,
+            incrementStatus: incrementStatus,
+            context: context,
+          );
         });
   }
 }

@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:remcards/components/notifications.dart';
 import 'package:remcards/const.dart';
-import 'package:remcards/pages/components/RoundedTextField.dart';
+import 'package:remcards/pages/components/rounded_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
-import 'components/AppBar.dart';
+import 'components/app_bar.dart';
 
 class addCardForm extends StatefulWidget {
   final Function refresh;

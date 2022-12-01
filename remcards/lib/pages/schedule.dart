@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_timetable_view/flutter_timetable_view.dart';
 import 'package:get/get.dart';
 import 'package:remcards/components/notifications.dart';
-import 'package:remcards/pages/AddSchedule.dart';
-import 'package:remcards/pages/components/RequestHeader.dart';
-import 'package:remcards/pages/components/ScheduleHeader.dart';
-import 'package:remcards/pages/EditSchedule.dart';
+import 'package:remcards/pages/add_schedule.dart';
+import 'package:remcards/pages/components/request_header.dart';
+import 'package:remcards/pages/components/schedule_header.dart';
+import 'package:remcards/pages/edit_schedule.dart';
 import '../const.dart';
-import 'components/AppBar.dart';
-import 'components/DayTable.dart';
-import 'components/Period.dart';
+import 'components/app_bar.dart';
+import 'components/day_table.dart';
+import 'components/period.dart';
 
 class SchedulePage extends StatefulWidget {
   final bool isRefresh;
@@ -167,6 +167,8 @@ class _SchedulePageState extends State<SchedulePage> {
         child: TimetableView(
             laneEventsList: _buildLaneEvents(width),
             timetableStyle: TimetableStyle(
+                startHour: 6,
+                endHour: 22,
                 timeItemTextColor: Colors.brown,
                 laneWidth: (width / 8),
                 timeItemWidth: (width / 8))),

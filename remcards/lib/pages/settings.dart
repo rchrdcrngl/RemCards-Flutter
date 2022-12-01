@@ -1,9 +1,9 @@
 import 'package:api_cache_manager/utils/cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:remcards/components/notifications.dart';
-import 'package:remcards/pages/components/UserFunctions.dart';
+import 'package:remcards/pages/components/user_functions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:remcards/pages/components/AppBar.dart';
+import 'package:remcards/pages/components/app_bar.dart';
 import 'login.dart';
 
 class Settings extends StatefulWidget {
@@ -21,6 +21,15 @@ logout() async {
 }
 
 class _Settings extends State<Settings> {
+
+  showSnack(String message) {
+    return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,12 +51,14 @@ class _Settings extends State<Settings> {
                     style: ElevatedButton.styleFrom(primary: Colors.red),
                     onPressed: () {
                       clearRemCards();
+                      showSnack('RemCards data has been cleared.');
                     },
                     child: Text("Clear All RemCards")),
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(primary: Colors.red),
                     onPressed: () {
                       clearSchedule();
+                      showSnack('Schedule data has been cleared.');
                     },
                     child: Text("Clear Schedule"))
               ],

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:remcards/pages/AddCard.dart';
-import 'package:remcards/pages/CardBuilder.dart';
+import 'package:remcards/pages/card_builder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'pages/Login.dart';
@@ -103,7 +103,7 @@ class _MainPageState extends State<MainPage> {
 
   cardsRefresh() {
     setState(() {
-      _widgetOptions[0] = cardBuilder2(isRefresh: true);
+      _widgetOptions[0] = CardBuilder(isRefresh: true);
     });
     print("MAIN: CARDS_REFRESH");
   }
@@ -127,7 +127,7 @@ class _MainPageState extends State<MainPage> {
 
   int _selectedIndex = 0;
   List<Widget> _widgetOptions = <Widget>[
-    cardBuilder2(),
+    CardBuilder(),
     SchedulePage(),
     addCardForm(),
     Settings(),
