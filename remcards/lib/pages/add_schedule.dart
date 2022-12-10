@@ -100,7 +100,7 @@ class _addSchedForm extends State<addSchedForm> {
                     Text("   Subject Name",
                         style: TextStyle(color: Colors.brown[900], fontSize: 10)),
                     SizedBox(height: 5.0),
-                    RoundedOutlineTextField("Subject Name", Colors.brown[900],
+                    RoundedOutlineTextField("Subject Name", Colors.brown[700],
                         Colors.brown[300], subjectController, false, 12),
                     SizedBox(height: 15.0),
                     Row(

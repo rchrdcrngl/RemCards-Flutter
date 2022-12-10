@@ -70,12 +70,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      print("Login pressed");
                       setState(() {
                         _isLoading = true;
                       });
                       signIn(usernameController.text, passwordController.text);
-                      //test();
                     },
                     style: ButtonStyle(
                         backgroundColor:
@@ -125,12 +123,9 @@ class _LoginPageState extends State<LoginPage> {
     };
     var response = await http.post(Uri.parse(loginURI),
         headers: headers, body: jsonEncode(data));
-    print("DEBUG: login-post");
-    print(response);
     jsonResponse = json.decode(response.body);
     //Decode response
     if (response.statusCode == 200) {
-      print(jsonResponse);
       if (jsonResponse != null) {
         setState(() {
           _isLoading = false;
@@ -138,16 +133,13 @@ class _LoginPageState extends State<LoginPage> {
         sharedPreferences.setString("token", jsonResponse['accessToken']);
         sharedPreferences.setString("uname", username);
         sharedPreferences.setBool("isProcessed", false);
-        Navigator.pushAndRemoveUntil(context,
-            MaterialPageRoute(builder: (BuildContext context) => MainPage()),
-                (Route<dynamic> route) => false);
+        Get.offAll(MainPage());
       }
     } else {
       setState(() {
         _isLoading = false;
       });
       errorMsg = jsonResponse['message'] ?? 'Error logging in';
-      print("The error message is: ${response.body}");
     }
   }
 }

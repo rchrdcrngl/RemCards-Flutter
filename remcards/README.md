@@ -7,9 +7,9 @@
 - [x] Add floating action bar (add) in RemCards Home
 - [x] Fix day picker in Add Schedule page
 - [x] Fix text box ui
-- [ ] Add Profile information in settings
-- [ ] Add Edit Profile page
-- [ ] Add Change Password page
+- [x] Add Profile information in settings
+- [x] Add Edit Profile page
+- [x] Add Change Password page
 - [x] Fix ThemeData and coherence across widgets
 - [ ] Add RemCards filter (future)
 - [ ] Migrate routing to GetX (future)

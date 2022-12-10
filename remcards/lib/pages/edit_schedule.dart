@@ -89,7 +89,7 @@ class _editSchedForm extends State<editSchedForm> {
                   Text("   Subject Name",
                       style: TextStyle(color: Colors.brown[900], fontSize: 10)),
                   SizedBox(height: 5.0),
-                  RoundedTextField("Subject Name", Colors.brown[900],
+                  RoundedOutlineTextField("Subject Name", Colors.brown[700],
                       Colors.brown[100], subject, false, 12),
                   SizedBox(height: 15.0),
                   Row(
@@ -120,7 +120,7 @@ class _editSchedForm extends State<editSchedForm> {
                                   hintText: "Start Time",
                                   hintStyle: TextStyle(
                                       color: Colors.brown[900].withOpacity(0.5)),
-                                  fillColor: Colors.brown[100]))],),
+                                  fillColor: Colors.brown[50]))],),
                       ),
                       SizedBox(width: 10,),
                       Expanded(
@@ -149,7 +149,7 @@ class _editSchedForm extends State<editSchedForm> {
                                   hintText: "Finish Time",
                                   hintStyle: TextStyle(
                                       color: Colors.brown[900].withOpacity(0.5)),
-                                  fillColor: Colors.brown[100])),
+                                  fillColor: Colors.brown[50])),
                         ],),
                       ),
                     ],

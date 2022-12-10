@@ -13,6 +13,7 @@ String timeToString(int hour, int min) {
   } else if (hour < 12) {
     return hour.toString() + ":" + appendZero(min) + " AM";
   } else {
+    if(hour-12==0) return "12:" + appendZero(min) + " PM";
     return (hour - 12).toString() + ":" + appendZero(min) + " PM";
   }
 }
