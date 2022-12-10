@@ -133,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
         sharedPreferences.setString("token", jsonResponse['accessToken']);
         sharedPreferences.setString("uname", username);
         sharedPreferences.setBool("isProcessed", false);
-        Get.offAll(MainPage());
+        Get.offAll(()=>MainPage());
       }
     } else {
       setState(() {

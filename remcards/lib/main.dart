@@ -133,11 +133,8 @@ class _MainPageState extends State<MainPage> {
 
   loginStatus() async {
     sharedPreferences = await SharedPreferences.getInstance();
-    print(sharedPreferences.getString("token"));
     if (sharedPreferences.getString("token") == null) {
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
-          (Route<dynamic> route) => false);
+      Get.offAll(()=>LoginPage());
     }
   }
 
