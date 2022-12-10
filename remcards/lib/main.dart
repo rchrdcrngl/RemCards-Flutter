@@ -39,6 +39,19 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "RemCards",
+      darkTheme: ThemeData(
+        bottomAppBarColor: Color(0xFF21334a),
+        primaryColor: Color(0xFF385880),
+        backgroundColor: Color(0xFF4a607d),
+        unselectedWidgetColor: Color(0xff788eaa),
+        scaffoldBackgroundColor: Color(0xff0b1a2c),
+        cardTheme: CardTheme(color: Color(0xFF4a607d)),
+        fontFamily: 'Inter',
+        textTheme: TextTheme(
+          headline1: TextStyle(fontSize: 24.0, fontWeight: FontWeight.w700,color: Colors.white),
+          bodyText1: TextStyle(fontSize: 12.0,color: Colors.white),
+        ),
+      ),
       theme: ThemeData(
         bottomAppBarColor: Color(0xFF21334a),
         primaryColor: Color(0xFF385880),
@@ -46,8 +59,8 @@ class MyApp extends StatelessWidget {
         unselectedWidgetColor: Color(0xff788eaa),
         fontFamily: 'Inter',
         textTheme: TextTheme(
-          headline1: TextStyle(fontSize: 24.0, fontWeight: FontWeight.w700),
-          bodyText1: TextStyle(fontSize: 12.0),
+          headline1: TextStyle(fontSize: 24.0, fontWeight: FontWeight.w700,color: Colors.black),
+          bodyText1: TextStyle(fontSize: 12.0,color: Colors.black),
         ),
       ),
       home: MainPage(),

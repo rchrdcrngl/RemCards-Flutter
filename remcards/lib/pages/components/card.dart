@@ -44,7 +44,7 @@ Widget RCard({RemCard remcard, BuildContext context, Function deleteCard, Functi
           SlidableAction(
             onPressed: (context) =>  _delete(),
             backgroundColor: Color(0xFFFE4A49),
-            foregroundColor: Colors.white,
+            foregroundColor: Theme.of(context).textTheme.bodyText1.color,
             icon: Icons.delete,
             label: 'Delete',
           )
@@ -66,12 +66,14 @@ Widget RCard({RemCard remcard, BuildContext context, Function deleteCard, Functi
                             Text(remcard.tskdesc,
                                 style: TextStyle(
                                     fontFamily: 'Montserrat',
+                                    color: Theme.of(context).textTheme.bodyText1.color,
                                     fontWeight: FontWeight.w700)),
                             Text(remcard.subjcode,
-                                style: TextStyle(fontFamily: 'Montserrat')),
+                                style: TextStyle(fontFamily: 'Montserrat',color: Theme.of(context).textTheme.bodyText1.color)),
                             Text(remcard.tskdate,
                                 style: TextStyle(
                                     fontFamily: 'Montserrat',
+                                    color: Theme.of(context).textTheme.bodyText1.color,
                                     fontWeight: FontWeight.w300))
                           ],
                         ),

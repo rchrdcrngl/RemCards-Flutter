@@ -28,9 +28,9 @@ class _addSchedForm extends State<addSchedForm> {
         TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
     _endTime =
         TimeOfDay(hour: (DateTime.now().hour + 1), minute: DateTime.now().hour);
-    subject = new TextEditingController();
-    timestart = new TextEditingController();
-    timefinished = new TextEditingController();
+    subjectController = new TextEditingController();
+    timestartController = new TextEditingController();
+    timefinishedController = new TextEditingController();
     daySelected = [];
     print(daySelected);
   }
@@ -43,8 +43,8 @@ class _addSchedForm extends State<addSchedForm> {
     if (_startTime != null) {
       setState(() {
         _startTime = newTime;
-        timestart.text =
-            appendZero(_startTime.hour) + ":" + appendZero(_startTime.minute);
+        timestartController.text =
+            timeToString(_startTime.hour, _startTime.minute);
       });
     }
     return null;
@@ -58,8 +58,8 @@ class _addSchedForm extends State<addSchedForm> {
     if (_endTime != null) {
       setState(() {
         _endTime = newTime;
-        timefinished.text =
-            appendZero(_endTime.hour) + ":" + appendZero(_endTime.minute);
+        timefinishedController.text =
+            timeToString(_endTime.hour, _endTime.minute);
       });
     }
     return null;
@@ -67,10 +67,10 @@ class _addSchedForm extends State<addSchedForm> {
 
   bool _isLoading = false;
   var errorMsg;
-  TextEditingController subject;
-  TextEditingController timestart;
-  TextEditingController timefinished;
-  TextEditingController dayfrm = new TextEditingController();
+  TextEditingController subjectController;
+  TextEditingController timestartController;
+  TextEditingController timefinishedController;
+  TextEditingController dayfrmController = new TextEditingController();
   List<bool> _isSelected = [false, false, false, false, false, false, false];
 
   selectDay(int index) {
@@ -100,8 +100,8 @@ class _addSchedForm extends State<addSchedForm> {
                     Text("   Subject Name",
                         style: TextStyle(color: Colors.brown[900], fontSize: 10)),
                     SizedBox(height: 5.0),
-                    RoundedTextField("Subject Name", Colors.brown[900],
-                        Colors.brown[100], subject, false, 12),
+                    RoundedOutlineTextField("Subject Name", Colors.brown[900],
+                        Colors.brown[300], subjectController, false, 12),
                     SizedBox(height: 15.0),
                     Row(
                       children: [
@@ -112,7 +112,7 @@ class _addSchedForm extends State<addSchedForm> {
                             SizedBox(height: 5.0),
                             TextFormField(
                                 readOnly: true,
-                                controller: timestart,
+                                controller: timestartController,
                                 onTap: _selectStartTime,
                                 style: TextStyle(color: Colors.brown[900], fontSize: 12),
                                 decoration: InputDecoration(
@@ -131,7 +131,7 @@ class _addSchedForm extends State<addSchedForm> {
                                     hintText: "Start Time",
                                     hintStyle: TextStyle(
                                         color: Colors.brown[900].withOpacity(0.5)),
-                                    fillColor: Colors.brown[100]))],),
+                                    fillColor: Colors.brown[50]))],),
                         ),
                         SizedBox(width: 10,),
                         Expanded(
@@ -140,7 +140,7 @@ class _addSchedForm extends State<addSchedForm> {
                                 style: TextStyle(color: Colors.brown[900], fontSize: 10)),
                             SizedBox(height: 5.0),
                             TextFormField(
-                                controller: timefinished,
+                                controller: timefinishedController,
                                 onTap: _selectFinishTime,
                                 readOnly: true,
                                 style: TextStyle(color: Colors.brown[900], fontSize: 12),
@@ -160,7 +160,7 @@ class _addSchedForm extends State<addSchedForm> {
                                     hintText: "Finish Time",
                                     hintStyle: TextStyle(
                                         color: Colors.brown[900].withOpacity(0.5)),
-                                    fillColor: Colors.brown[100])),
+                                    fillColor:  Colors.brown[50])),
                           ],),
                         ),
                       ],
@@ -171,11 +171,8 @@ class _addSchedForm extends State<addSchedForm> {
                           setState(() {
                             _isLoading = true;
                           });
-                          await addSched(daySelected, subject.text, timestart.text,
-                              timefinished.text);
-                          setState(() {
-                            _isLoading = false;
-                          });
+                          await addSched(daySelected, subjectController.text, _startTime,
+                              _endTime);
                           widget.refresh();
                           Get.back();
                         },
@@ -196,24 +193,49 @@ class _addSchedForm extends State<addSchedForm> {
       ),
     );
   }
+
+  addSched(List<int> day, String subject, TimeOfDay start, TimeOfDay finish) async {
+    //Data Validation
+    if(subject==''||start==null||finish==null||day.isEmpty){
+      setState(() {
+        _isLoading = false;
+      });
+      showToast(message: 'Provide title, day/s, and time period.');
+      throw Exception('Validation error');
+    }
+    if(!(start<finish)){
+      setState(() {
+        _isLoading = false;
+      });
+      showToast(message: 'Start time should be earlier than finish time');
+      throw Exception('Validation error');
+    }
+    if(start.hour<6||finish.hour>22){
+      setState(() {
+        _isLoading = false;
+      });
+      showToast(message: 'Please select time from 6 AM to 10 PM');
+      throw Exception('Validation error');
+    }
+    //Send POST request
+    Map<String, String> headers = await getRequestHeaders();
+    day.forEach((element) async {
+      Map data = {"subject": subject, "startTime": get24HourFromTimeOfDay(start), "endTime": get24HourFromTimeOfDay(finish)};
+      var response = await http.post(Uri.parse('${schedURI}/${element}'),
+          headers: headers, body: jsonEncode(data));
+      if (response.statusCode == 201) {
+        print("Successful");
+      } else {
+        print("Error");
+      }
+    });
+  }
 }
 
-addSched(List<int> day, String title, String start, String finish) async {
-  //Data Validation
-  if(title==''||start==''||finish==''||day.isEmpty){
-    Get.snackbar('Incomplete fields', 'Provide title, day/s, and time period.');
-    return;
+extension TimeOfDayExtension on TimeOfDay {
+  operator < (TimeOfDay other){
+    if(hour>other.hour) return false;
+    if(hour==other.hour && minute>=other.minute) return false;
+    return true;
   }
-  //Send POST request
-  Map<String, String> headers = await getRequestHeaders();
-  day.forEach((element) async {
-    Map data = {"subject": title, "startTime": start, "endTime": finish};
-    var response = await http.post(Uri.parse('${schedURI}/${element}'),
-        headers: headers, body: jsonEncode(data));
-    if (response.statusCode == 200) {
-      print("Successful");
-    } else {
-      print("Error");
-    }
-  });
 }

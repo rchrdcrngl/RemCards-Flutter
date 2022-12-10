@@ -34,9 +34,9 @@ class _editSchedForm extends State<editSchedForm> {
     _endTime = TimeOfDay(hour: widget.hourFinish, minute: widget.minFinish);
     subject = new TextEditingController(text: widget.title);
     timestart = new TextEditingController(
-        text: appendZero(widget.hourStart) + ":" + appendZero(widget.minStart));
+        text: timeToString(widget.hourStart, widget.minStart));
     timefinished = new TextEditingController(
-        text: appendZero(widget.hourFinish) + ":" + appendZero(widget.minFinish));
+        text: timeToString(widget.hourFinish, widget.minFinish));
   }
 
   Future<Null> _selectStartTime() async {
@@ -49,7 +49,7 @@ class _editSchedForm extends State<editSchedForm> {
       setState(() {
         _startTime = newTime;
         timestart.text =
-            appendZero(_startTime.hour) + ":" + appendZero(_startTime.minute);
+            timeToString(_startTime.hour, _startTime.minute);
       });
     }
     return null;
@@ -65,7 +65,7 @@ class _editSchedForm extends State<editSchedForm> {
       setState(() {
         _endTime = newTime;
         timefinished.text =
-            appendZero(_endTime.hour) + ":" + appendZero(_endTime.minute);
+            timeToString(_endTime.hour, _endTime.minute);
       });
     }
     return null;
@@ -161,7 +161,7 @@ class _editSchedForm extends State<editSchedForm> {
                           _isLoading = true;
                         });
                         await editSched(widget.day, widget.id, subject.text,
-                            timestart.text, timefinished.text);
+                            _startTime, _endTime);
                         setState(() {
                           _isLoading = false;
                         });
@@ -172,7 +172,7 @@ class _editSchedForm extends State<editSchedForm> {
                           backgroundColor:
                               MaterialStateProperty.all(Colors.teal[100]),
                           elevation: MaterialStateProperty.all(0)),
-                      child: Text("Edit Schedule",
+                      child: Text("Edit Period",
                           style: TextStyle(color: Colors.teal[700]))),
                   SizedBox(height: 5.0),
                   ElevatedButton(
@@ -191,7 +191,7 @@ class _editSchedForm extends State<editSchedForm> {
                           backgroundColor:
                               MaterialStateProperty.all(Colors.red[900]),
                           elevation: MaterialStateProperty.all(0)),
-                      child: Text("Delete Schedule",
+                      child: Text("Delete Period",
                           style: TextStyle(color: Colors.white))),
                   errorMsg == null
                       ? Container()
@@ -203,25 +203,42 @@ class _editSchedForm extends State<editSchedForm> {
       ),
     );
   }
-}
 
-editSched(
-    int day, String id, String title, String start, String finish) async {
-  //Data Validation
-  if(title==''||start==''||finish==''){
-    Get.snackbar('Incomplete fields', 'Provide title, day/s, and time period.');
-    return;
+  editSched(
+      int day, String id, String subject, TimeOfDay start, TimeOfDay finish) async {
+    //Data Validation
+    if(subject==''||start==null||finish==null){
+      setState(() {
+        _isLoading = false;
+      });
+      showToast(message: 'Provide title, day/s, and time period.');
+      throw Exception('Validation error');
+    }
+    if(!(start<finish)){
+      setState(() {
+        _isLoading = false;
+      });
+      showToast(message: 'Start time should be earlier than finish time');
+      throw Exception('Validation error');
+    }
+    if(start.hour<6||finish.hour>22){
+      setState(() {
+        _isLoading = false;
+      });
+      showToast(message: 'Please select time from 6 AM to 10 PM');
+      throw Exception('Validation error');
+    }
+    //Send POST request
+    Map data = {"subject": subject, "startTime": get24HourFromTimeOfDay(start), "endTime": get24HourFromTimeOfDay(finish)};
+    var response = await http.post(Uri.parse('${schedURI}/${day}/${id}'),
+        headers: await getRequestHeaders(), body: jsonEncode(data));
+    if (response.statusCode == 204) {
+      print("Successful");
+    } else {
+      print("Error");
+    }
+    Get.back();
   }
-  //Send POST request
-  Map data = {"subject": title, "time": (start + "-" + finish)};
-  var response = await http.post(Uri.parse('${schedURI}/${day}/${id}'),
-      headers: await getRequestHeaders(), body: jsonEncode(data));
-  if (response.statusCode == 204) {
-    print("Successful");
-  } else {
-    print("Error");
-  }
-  Get.back();
 }
 
 deleteSched(String id, int day) async {
@@ -231,5 +248,13 @@ deleteSched(String id, int day) async {
     print("Successful");
   } else {
     print("Error");
+  }
+}
+
+extension TimeOfDayExtension on TimeOfDay {
+  operator < (TimeOfDay other){
+    if(hour>other.hour) return false;
+    if(hour==other.hour && minute>=other.minute) return false;
+    return true;
   }
 }

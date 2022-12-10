@@ -14,6 +14,7 @@ import 'package:remcards/pages/login.dart';
 import 'add_card.dart';
 import 'components/app_bar.dart';
 import 'components/remcard.dart';
+import 'components/utils.dart';
 
 
 //======================= builder ===========
@@ -106,7 +107,10 @@ class _CardBuilderState extends State<CardBuilder> {
           IconButton(
             icon: Icon(Icons.refresh),
             iconSize: 15,
-            onPressed: _refresh,
+            onPressed: (){
+              showToast(message:'Refreshing RemCards');
+              _refresh();
+            },
           )
         ],context: context),
         key: scaffoldKey,

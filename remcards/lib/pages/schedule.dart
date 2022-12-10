@@ -9,6 +9,7 @@ import 'package:remcards/components/notifications.dart';
 import 'package:remcards/pages/add_schedule.dart';
 import 'package:remcards/pages/components/request_header.dart';
 import 'package:remcards/pages/components/schedule_header.dart';
+import 'package:remcards/pages/components/utils.dart';
 import 'package:remcards/pages/edit_schedule.dart';
 import '../const.dart';
 import 'components/app_bar.dart';
@@ -66,7 +67,6 @@ class _SchedulePageState extends State<SchedulePage> {
       });
 
   fetchData() async {
-    print("load-posts");
     fetchPost().then((data) {
       setState(() {
         DayScheduleList = data;
@@ -98,11 +98,11 @@ class _SchedulePageState extends State<SchedulePage> {
             new APICacheDBModel(key: "API-Schedule", syncData: response.body);
         await APICacheManager().addCacheData(cacheDBModel);
 
-        List jsonResponse = json.decode(response.body);
+        List jsonResponse = await json.decode(response.body);
         var data =
             jsonResponse.map((day) => new DaySchedule.fromJson(day)).toList();
 
-        processNotification(data);
+        await processNotification(data);
         return data;
       } else {
         throw Exception('Failed to load Schedule');
@@ -110,7 +110,7 @@ class _SchedulePageState extends State<SchedulePage> {
     } else {
       //Data is already cached
       var cacheData = await APICacheManager().getCacheData("API-Schedule");
-      List jsonResponse = json.decode(cacheData.syncData);
+      List jsonResponse = await json.decode(cacheData.syncData);
       return jsonResponse.map((day) => new DaySchedule.fromJson(day)).toList();
     }
   }
@@ -161,7 +161,10 @@ class _SchedulePageState extends State<SchedulePage> {
         IconButton(
           icon: Icon(Icons.refresh),
           iconSize: 15,
-          onPressed: _refresh,
+          onPressed: (){
+            showToast(message:'Refreshing schedule data');
+            _refresh();
+          },
         )
       ], context: context),
       body: Container(
@@ -174,7 +177,7 @@ class _SchedulePageState extends State<SchedulePage> {
                 timelineItemColor: Theme.of(context).scaffoldBackgroundColor,
                 mainBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 startHour: 6,
-                endHour: 22,
+                endHour: 23,
                 timeItemTextColor: Colors.brown,
                 laneWidth: (width / 8),
                 timeItemWidth: (width / 8))),

@@ -9,6 +9,8 @@ import 'package:remcards/pages/components/rounded_text_field.dart';
 import 'components/app_bar.dart';
 import 'package:get/get.dart';
 
+import 'components/utils.dart';
+
 const Map<String,int> levelStringToInt = {
   'Normal':0, 'Needs Action':1, 'Urgent':2
 };
@@ -66,19 +68,19 @@ class _AddCardForm extends State<AddCardForm> {
             ? Center(child: CircularProgressIndicator())
             : ListView(
                 children: <Widget>[
+                  Text("   Task Description",
+                      style: TextStyle(
+                          color: Colors.deepPurple[900], fontSize: 10)),
+                  SizedBox(height: 5.0),
+                  RoundedOutlineTextField("Task Description", Colors.deepPurple[900],
+                      Colors.deepPurple[500], taskDesc, false, 24),
+                  SizedBox(height: 15.0),
                   Text("   Subject Code",
                       style: TextStyle(
                           color: Colors.deepPurple[900], fontSize: 10)),
                   SizedBox(height: 5.0),
                   RoundedTextField("Subject Code", Colors.deepPurple[900],
                       Colors.deepPurple[100], subjectCode, false, 12),
-                  SizedBox(height: 15.0),
-                  Text("   Task Description",
-                      style: TextStyle(
-                          color: Colors.deepPurple[900], fontSize: 10)),
-                  SizedBox(height: 5.0),
-                  RoundedTextField("Task Description", Colors.deepPurple[900],
-                      Colors.deepPurple[100], taskDesc, false, 12),
                   SizedBox(height: 15.0),
                   Text("   Task Date",
                       style: TextStyle(
@@ -142,11 +144,11 @@ class _AddCardForm extends State<AddCardForm> {
   addCard(String subjcode, String tskdesc, String tskdate, String tsklvl) async {
     //Data Validation
     if(subjcode==''||tskdesc==''||tskdate==''||tsklvl==''){
-      Get.snackbar('Incomplete fields', 'Provide subject code, task description, task date, task level.',snackPosition: SnackPosition.BOTTOM,);
+      showToast(message: 'Provide subject code, task description, task date, task level.');
       setState(() {
         _isLoading = false;
       });
-      return;
+      throw Exception('Validation error');
     }
     //Send POST request
     Map data = {
