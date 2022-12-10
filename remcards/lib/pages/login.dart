@@ -31,12 +31,19 @@ class _LoginPageState extends State<LoginPage> {
             : ListView(
                 children: <Widget>[
                   Center(
-                    child: Text("Welcome Back to RemCards!",
-                        style: TextStyle(
-                            color: Colors.teal[600],
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 24)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset("assets/icon/icon.png", height: 50, fit: BoxFit.contain,),
+                        SizedBox(height: 8,),
+                        Text("Welcome Back to RemCards!",
+                            style: TextStyle(
+                                color: Colors.teal[600],
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w700,
+                                fontSize: 24)),
+                      ],
+                    ),
                   ),
                   SizedBox(height: 30.0),
                   RoundedTextField("Username", Colors.blueGrey[900],
@@ -44,7 +51,23 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(height: 20.0),
                   RoundedTextField("Password", Colors.blueGrey[900],
                       Colors.blueGrey[200], passwordController, true, 12),
-                  SizedBox(height: 30.0),
+                  errorMsg == null
+                      ? SizedBox(
+                    height: 5,
+                  )
+                      : Container(
+                    height: 25,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "${errorMsg}",
+                        style: TextStyle(
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
                   ElevatedButton(
                     onPressed: () {
                       print("Login pressed");
@@ -62,23 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(
                             fontFamily: 'Montserrat', color: Colors.white)),
                   ),
-                  errorMsg == null
-                      ? SizedBox(
-                          height: 20,
-                        )
-                      : Container(
-                        height: 25,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                              "${errorMsg}",
-                              style: TextStyle(
-                                color: Colors.redAccent,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                        ),
-                      ),
+                  SizedBox(height: 5.0),
                   ElevatedButton(
                     onPressed: () {
                       Get.to(() => RegisterPage());
@@ -87,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                         backgroundColor:
                             MaterialStateProperty.all(Colors.purple),
                         elevation: MaterialStateProperty.all(0)),
-                    child: Text("No Account? Register",
+                    child: Text("Don't have an account? Register",
                         style: TextStyle(
                             fontFamily: 'Montserrat', color: Colors.white)),
                   ),
@@ -98,7 +105,16 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   signIn(String username, String password) async {
-    print("signin");
+    //Input Validation
+    if(username == "") {
+      setState(()=> {errorMsg = "Username is required!",_isLoading = false});
+      return;
+    }
+    if(password == "") {
+      setState(()=>{errorMsg = "Password is required!",_isLoading = false});
+      return;
+    }
+    //Send request
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     Map data = {'username': username, 'password': password};
     var jsonResponse;
@@ -112,6 +128,7 @@ class _LoginPageState extends State<LoginPage> {
     print("DEBUG: login-post");
     print(response);
     jsonResponse = json.decode(response.body);
+    //Decode response
     if (response.statusCode == 200) {
       print(jsonResponse);
       if (jsonResponse != null) {

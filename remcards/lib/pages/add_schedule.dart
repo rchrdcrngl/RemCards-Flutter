@@ -4,10 +4,10 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:remcards/const.dart';
 import 'package:remcards/pages/components/day_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'components/app_bar.dart';
+import 'components/request_header.dart';
 import 'components/rounded_text_field.dart';
+import 'components/utils.dart';
 
 class addSchedForm extends StatefulWidget {
   final Function refresh;
@@ -36,7 +36,6 @@ class _addSchedForm extends State<addSchedForm> {
   }
 
   Future<Null> _selectStartTime() async {
-    print("sst");
     final TimeOfDay newTime = await showTimePicker(
       context: context,
       initialTime: _startTime,
@@ -45,14 +44,13 @@ class _addSchedForm extends State<addSchedForm> {
       setState(() {
         _startTime = newTime;
         timestart.text =
-            _startTime.hour.toString() + ":" + _startTime.minute.toString();
+            appendZero(_startTime.hour) + ":" + appendZero(_startTime.minute);
       });
     }
     return null;
   }
 
   Future<Null> _selectFinishTime() async {
-    print("sft");
     final TimeOfDay newTime = await showTimePicker(
       context: context,
       initialTime: _endTime,
@@ -61,7 +59,7 @@ class _addSchedForm extends State<addSchedForm> {
       setState(() {
         _endTime = newTime;
         timefinished.text =
-            _endTime.hour.toString() + ":" + _endTime.minute.toString();
+            appendZero(_endTime.hour) + ":" + appendZero(_endTime.minute);
       });
     }
     return null;
@@ -82,121 +80,132 @@ class _addSchedForm extends State<addSchedForm> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: rcAppBar("Add Schedule"),
+      appBar: rcAppBar(text:"Add Schedule", context: context),
       body: Container(
         padding: EdgeInsets.all(20.0),
         child: _isLoading
             ? Center(child: CircularProgressIndicator())
-            : ListView(
-                children: <Widget>[
-                  Row(
-                    children: [
-                      Expanded(
-                          child: ClipRRect(
-                              child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: dayPicker(
+            : SingleChildScrollView(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Center(
+                      child: dayPicker(
                           isSelected: _isSelected,
                           setState: setState,
                           selectDay: selectDay
-                        ))))
-                    ],
-                  ),
-                  SizedBox(height: 25.0),
-                  Text("   Subject Name",
-                      style: TextStyle(color: Colors.brown[900], fontSize: 10)),
-                  SizedBox(height: 5.0),
-                  RoundedTextField("Subject Name", Colors.brown[900],
-                      Colors.brown[100], subject, false, 12),
-                  SizedBox(height: 15.0),
-                  Text("   Start Time",
-                      style: TextStyle(color: Colors.brown[900], fontSize: 10)),
-                  SizedBox(height: 5.0),
-                  TextFormField(
-                      controller: timestart,
-                      onTap: _selectStartTime,
-                      style: TextStyle(color: Colors.brown[900], fontSize: 12),
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 15.0),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.transparent, width: 0.0),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.lightBlueAccent, width: 1.0),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          filled: true,
-                          hintText: "Start Time",
-                          hintStyle: TextStyle(
-                              color: Colors.brown[900].withOpacity(0.5)),
-                          fillColor: Colors.brown[100])),
-                  SizedBox(height: 15.0),
-                  Text("   Finish Time",
-                      style: TextStyle(color: Colors.brown[900], fontSize: 10)),
-                  SizedBox(height: 5.0),
-                  TextFormField(
-                      controller: timefinished,
-                      onTap: _selectFinishTime,
-                      style: TextStyle(color: Colors.brown[900], fontSize: 12),
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 15.0),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.transparent, width: 0.0),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.lightBlueAccent, width: 1.0),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          filled: true,
-                          hintText: "Finish Time",
-                          hintStyle: TextStyle(
-                              color: Colors.brown[900].withOpacity(0.5)),
-                          fillColor: Colors.brown[100])),
-                  SizedBox(height: 30.0),
-                  ElevatedButton(
-                      onPressed: () {
-                        addSched(daySelected, subject.text, timestart.text,
-                            timefinished.text);
-                        Get.back();
-                        widget.refresh();
-                        //Get.off(() => MainPage(pageIdx: 1));
-                      },
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              Colors.amberAccent[100]),
-                          elevation: MaterialStateProperty.all(0)),
-                      child: Text("Add Schedule",
-                          style: TextStyle(color: Colors.brown[600]))),
-                  errorMsg == null
-                      ? Container()
-                      : Text(
-                          "${errorMsg}",
+                      ),
+                    ),
+                    SizedBox(height: 25.0),
+                    Text("   Subject Name",
+                        style: TextStyle(color: Colors.brown[900], fontSize: 10)),
+                    SizedBox(height: 5.0),
+                    RoundedTextField("Subject Name", Colors.brown[900],
+                        Colors.brown[100], subject, false, 12),
+                    SizedBox(height: 15.0),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(children: [
+                            Text("Start Time",
+                                style: TextStyle(color: Colors.brown[900], fontSize: 10)),
+                            SizedBox(height: 5.0),
+                            TextFormField(
+                                readOnly: true,
+                                controller: timestart,
+                                onTap: _selectStartTime,
+                                style: TextStyle(color: Colors.brown[900], fontSize: 12),
+                                decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 3.0, horizontal: 10.0),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.transparent, width: 0.0),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlueAccent, width: 1.0),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    filled: true,
+                                    hintText: "Start Time",
+                                    hintStyle: TextStyle(
+                                        color: Colors.brown[900].withOpacity(0.5)),
+                                    fillColor: Colors.brown[100]))],),
                         ),
-                ],
-              ),
+                        SizedBox(width: 10,),
+                        Expanded(
+                          child: Column(children: [
+                            Text("Finish Time",
+                                style: TextStyle(color: Colors.brown[900], fontSize: 10)),
+                            SizedBox(height: 5.0),
+                            TextFormField(
+                                controller: timefinished,
+                                onTap: _selectFinishTime,
+                                readOnly: true,
+                                style: TextStyle(color: Colors.brown[900], fontSize: 12),
+                                decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 3.0, horizontal: 10.0),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.transparent, width: 0.0),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlueAccent, width: 1.0),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    filled: true,
+                                    hintText: "Finish Time",
+                                    hintStyle: TextStyle(
+                                        color: Colors.brown[900].withOpacity(0.5)),
+                                    fillColor: Colors.brown[100])),
+                          ],),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20.0),
+                    ElevatedButton(
+                        onPressed: () async {
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          await addSched(daySelected, subject.text, timestart.text,
+                              timefinished.text);
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          widget.refresh();
+                          Get.back();
+                        },
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                Colors.amberAccent[100]),
+                            elevation: MaterialStateProperty.all(0)),
+                        child: Text("Add Schedule",
+                            style: TextStyle(color: Colors.brown[600]))),
+                    errorMsg == null
+                        ? Container()
+                        : Text(
+                            "${errorMsg}",
+                          ),
+                  ],
+                ),
+            ),
       ),
     );
   }
 }
 
 addSched(List<int> day, String title, String start, String finish) async {
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  String token = sharedPreferences.getString("token");
-  Map<String, String> headers = {
-    'Accept': '*/*',
-    "Access-Control_Allow_Origin": "*",
-    "Content-Type": "application/json",
-    "x-access-token": token,
-  };
-
+  //Data Validation
+  if(title==''||start==''||finish==''||day.isEmpty){
+    Get.snackbar('Incomplete fields', 'Provide title, day/s, and time period.');
+    return;
+  }
+  //Send POST request
+  Map<String, String> headers = await getRequestHeaders();
   day.forEach((element) async {
     Map data = {"subject": title, "startTime": start, "endTime": finish};
     var response = await http.post(Uri.parse('${schedURI}/${element}'),

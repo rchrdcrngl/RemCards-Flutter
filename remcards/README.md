@@ -3,14 +3,14 @@
 - [x] Fix Bad state: Stream has already been listened to. (Removed Flutter Notification stream)
 - [ ] Update nav bar ui
 - [ ] Update Edit/Add Card UI
-- [ ] Change status icon to pill button (icon + status)
+- [x] Change status icon to pill button (icon + status)
 - [x] Add floating action bar (add) in RemCards Home
 - [ ] Fix day picker in Add Schedule page
 - [ ] Fix text box ui
 - [ ] Add Profile information in settings
 - [ ] Add Edit Profile page
 - [ ] Add Change Password page
-- [ ] Fix ThemeData and coherence across widgets
+- [x] Fix ThemeData and coherence across widgets
 - [ ] Add RemCards filter (future)
-- [ ] Migrate routing to GetX
-- [ ] Add Schedule Caching
+- [ ] Migrate routing to GetX (future)
+- [x] Add Schedule Caching

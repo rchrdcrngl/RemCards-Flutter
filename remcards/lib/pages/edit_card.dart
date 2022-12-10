@@ -13,12 +13,12 @@ const Map<int, String> tskLevelMapFromInt = {0:'Normal', 1:'Needs Action', 2:'Ur
 
 class editCardForm extends StatefulWidget {
   final RemCard remcard;
-  final Function callback;
+  final Function refresh;
 
   const editCardForm(
       {Key key,
       this.remcard,
-      this.callback})
+      this.refresh})
       : super(key: key);
 
   @override
@@ -71,7 +71,7 @@ class _editCardForm extends State<editCardForm> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: rcAppBar("Edit Card"),
+      appBar: rcAppBar(text:"Edit Card",context: context),
       body: Container(
         padding: EdgeInsets.all(20.0),
         child: _isLoading
@@ -126,11 +126,11 @@ class _editCardForm extends State<editCardForm> {
                   ),
                   SizedBox(height: 20.0),
                   ElevatedButton(
-                      onPressed: () {
-                        editCard(widget.remcard.id, subjectCode.text, taskDesc.text,
+                      onPressed: () async {
+                        await editCard(widget.remcard.id, subjectCode.text, taskDesc.text,
                             taskDate.text, dropdownvalue);
+                        widget.refresh();
                         Get.back();
-                        widget.callback();
                       },
                       style: ButtonStyle(
                           backgroundColor:
@@ -148,23 +148,34 @@ class _editCardForm extends State<editCardForm> {
       ),
     );
   }
-}
 
-editCard(String id, String subjcode, String tskdesc, String tskdate,
-    String tsklvl) async {
-  int tsklvl_int = tskLevelMapFromString[tsklvl] ?? 0;
-  final headers = await getRequestHeaders();
-  Map data = {
-    'subjcode': subjcode,
-    'tskdesc': tskdesc,
-    'tskdate': tskdate,
-    'tsklvl': tsklvl_int
-  };
-  var response = await http.post(Uri.parse('${cardsURI}/${id}'),
-      headers: headers, body: jsonEncode(data));
-  if (response.statusCode == 204) {
-    print("Successful");
-  } else {
-    print("Error");
+  editCard(String id, String subjcode, String tskdesc, String tskdate,
+      String tsklvl) async {
+    //Data Validation
+    if(subjcode==''||tskdesc==''||tskdate==''||tsklvl==''){
+      Get.snackbar('Incomplete fields', 'Provide subject code, task description, task date, task level.');
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+    //Send POST request
+    int tsklvl_int = tskLevelMapFromString[tsklvl] ?? 0;
+    final headers = await getRequestHeaders();
+    Map data = {
+      'subjcode': subjcode,
+      'tskdesc': tskdesc,
+      'tskdate': tskdate,
+      'tsklvl': tsklvl_int
+    };
+    var response = await http.post(Uri.parse('${cardsURI}/${id}'),
+        headers: headers, body: jsonEncode(data));
+    if (response.statusCode == 204) {
+      print("Successful");
+    } else {
+      print("Error");
+    }
   }
 }
+
+

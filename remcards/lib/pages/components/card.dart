@@ -27,13 +27,22 @@ Map<int,Color> color = {
 
 Widget RCard({RemCard remcard, BuildContext context, Function deleteCard, Function refresh, Function incrementStatus}) {
     remcard.tskstat = remcard.tskstat % 5;
+    _delete() async {
+      await deleteCard(remcard.id);
+      refresh();
+    }
+
+    _incstat() async{
+      await incrementStatus(remcard.id, remcard.tskstat);
+      refresh();
+    }
     return Slidable(
       key: const ValueKey(0),
       startActionPane: ActionPane(
         motion: const BehindMotion(),
         children: [
           SlidableAction(
-            onPressed: (context) => {deleteCard(remcard.id), refresh()},
+            onPressed: (context) =>  _delete(),
             backgroundColor: Color(0xFFFE4A49),
             foregroundColor: Colors.white,
             icon: Icons.delete,
@@ -69,12 +78,9 @@ Widget RCard({RemCard remcard, BuildContext context, Function deleteCard, Functi
                       ),
                       SizedBox(width: 8,),
                       ElevatedButton(
-                        onPressed: () {
-                          incrementStatus(remcard.id, remcard.tskstat);
-                          refresh();
-                        },
+                        onPressed: ()=>_incstat(),
                         child: Padding(
-                          padding: EdgeInsets.all(2),
+                          padding: EdgeInsets.symmetric(horizontal: 1.5, vertical: 1),
                           child: Row(
                             children: [
                               iconMap[remcard.tskstat]??Icon(Icons.adjust_rounded, color: Colors.white),
@@ -86,6 +92,7 @@ Widget RCard({RemCard remcard, BuildContext context, Function deleteCard, Functi
                         style: ButtonStyle(
                           shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0),)),
                           padding: MaterialStateProperty.all(EdgeInsets.all(5)),
+                          elevation: MaterialStateProperty.all(0),
                           backgroundColor: MaterialStateProperty.all(
                               color[remcard.tsklvl]??Color(0xFF2980b9)), // <-- Button color
                         ),
@@ -103,7 +110,7 @@ Widget RCard({RemCard remcard, BuildContext context, Function deleteCard, Functi
                   MaterialPageRoute(
                     builder: (context) => editCardForm(
                         remcard: remcard,
-                        callback: refresh),
+                        refresh: refresh),
                   ));
             }),
       ),

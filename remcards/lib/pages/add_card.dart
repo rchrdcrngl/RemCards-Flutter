@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:remcards/components/notifications.dart';
 import 'package:remcards/const.dart';
+import 'package:remcards/pages/components/request_header.dart';
 import 'package:remcards/pages/components/rounded_text_field.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../main.dart';
 import 'components/app_bar.dart';
 import 'package:get/get.dart';
+
+const Map<String,int> levelStringToInt = {
+  'Normal':0, 'Needs Action':1, 'Urgent':2
+};
 
 class AddCardForm extends StatefulWidget {
   final Function refresh;
@@ -53,9 +56,10 @@ class _AddCardForm extends State<AddCardForm> {
   final TextEditingController taskLevel = new TextEditingController();
   final TextEditingController taskStat = new TextEditingController();
   String dropdownvalue = "Normal";
+
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: rcAppBar("Add Card"),
+      appBar: rcAppBar(text:"Add Card", context: context),
       body: Container(
         padding: EdgeInsets.all(20.0),
         child: _isLoading
@@ -109,12 +113,13 @@ class _AddCardForm extends State<AddCardForm> {
                   ),
                   SizedBox(height: 20.0),
                   ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         setState(() {
                           _isLoading = true;
                         });
-                        addCard(subjectCode.text, taskDesc.text, taskDate.text,
+                        await addCard(subjectCode.text, taskDesc.text, taskDate.text,
                             dropdownvalue);
+                        await widget.refresh();
                         Get.back();
                       },
                       style: ButtonStyle(
@@ -133,47 +138,37 @@ class _AddCardForm extends State<AddCardForm> {
       ),
     );
   }
-}
 
-addCard(String subjcode, String tskdesc, String tskdate, String tsklvl) async {
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  String token = sharedPreferences.getString("token");
-  int tsklvl_int = 0;
-  Map<String, String> headers = {
-    'Accept': '*/*',
-    "Access-Control_Allow_Origin": "*",
-    "Content-Type": "application/json",
-    "x-access-token": token,
-  };
-  switch (tsklvl) {
-    case "Normal":
-      tsklvl_int = 0;
-      break;
-    case "Needs Action":
-      tsklvl_int = 1;
-      break;
-    case "Urgent":
-      tsklvl_int = 2;
-      break;
-    default:
-      tsklvl_int = 0;
-  }
-  Map data = {
-    'subjcode': subjcode,
-    'tskdesc': tskdesc,
-    'tskdate': tskdate,
-    'tsklvl': tsklvl_int,
-    'tskstat': 0
-  };
-  var response = await http.post(Uri.parse(cardsURI),
-      headers: headers, body: jsonEncode(data));
-  if (response.statusCode == 201) {
-    print("Successful");
-    var date = tskdate.split("/");
-    print(date);
-    createReminderNotification(subjcode, tskdesc, int.parse(date[0]),
-        int.parse(date[1]), int.parse(date[2]));
-  } else {
-    print("Error");
+  addCard(String subjcode, String tskdesc, String tskdate, String tsklvl) async {
+    //Data Validation
+    if(subjcode==''||tskdesc==''||tskdate==''||tsklvl==''){
+      Get.snackbar('Incomplete fields', 'Provide subject code, task description, task date, task level.',snackPosition: SnackPosition.BOTTOM,);
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+    //Send POST request
+    Map data = {
+      'subjcode': subjcode,
+      'tskdesc': tskdesc,
+      'tskdate': tskdate,
+      'tsklvl': levelStringToInt[tsklvl]??0,
+      'tskstat': 0
+    };
+    var response = await http.post(Uri.parse(cardsURI),
+        headers: await getRequestHeaders(), body: jsonEncode(data));
+    if (response.statusCode == 201) {
+      print("Successful");
+      var date = tskdate.split("/");
+      print(date);
+      createReminderNotification(subjcode, tskdesc, int.parse(date[0]),
+          int.parse(date[1]), int.parse(date[2]));
+    } else {
+      print("Error");
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 }

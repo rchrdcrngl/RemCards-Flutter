@@ -24,12 +24,6 @@ class SchedulePage extends StatefulWidget {
   _SchedulePageState createState() => _SchedulePageState();
 }
 
-edit(int day, String id, String title, int hourStart, int minStart,
-    int hourFinish, int minFinish) {
-  Get.to(() => editSchedForm(
-      day, id, title, hourStart, minStart, hourFinish, minFinish));
-}
-
 processNotification(List<DaySchedule> resp) async {
   print("STARTING TO PROCESS NOTIF");
   for (DaySchedule day in resp) {
@@ -140,6 +134,7 @@ class _SchedulePageState extends State<SchedulePage> {
       DayScheduleList.forEach((element) {
         list.add(LaneEvents(
             lane: Lane(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 name: numToDay[element.day].substring(0, 3).toUpperCase() ??
                     'N/A',
                 width: (width / 8),
@@ -148,25 +143,36 @@ class _SchedulePageState extends State<SchedulePage> {
       });
       return list;
     } else {
-      return ScheduleHeader(width);
+      return ScheduleHeader(width: width, context: context);
     }
+  }
+
+  edit(int day, String id, String title, int hourStart, int minStart,
+      int hourFinish, int minFinish) {
+    Get.to(() => editSchedForm(
+        day, id, title, hourStart, minStart, hourFinish, minFinish, _refresh));
   }
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: rcAppBarActions("Schedule", <Widget>[
+      appBar: rcAppBarActions(text: "Schedule", actions: <Widget>[
         IconButton(
           icon: Icon(Icons.refresh),
           iconSize: 15,
           onPressed: _refresh,
         )
-      ]),
+      ], context: context),
       body: Container(
         child: TimetableView(
             laneEventsList: _buildLaneEvents(width),
             timetableStyle: TimetableStyle(
+                laneColor: Theme.of(context).scaffoldBackgroundColor,
+                cornerColor: Theme.of(context).scaffoldBackgroundColor,
+                timelineColor: Theme.of(context).scaffoldBackgroundColor,
+                timelineItemColor: Theme.of(context).scaffoldBackgroundColor,
+                mainBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 startHour: 6,
                 endHour: 22,
                 timeItemTextColor: Colors.brown,

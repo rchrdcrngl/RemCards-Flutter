@@ -7,7 +7,7 @@ Widget RoundedTextField(String hintText, Color hintStyleColor, Color fillColor,
     obscureText: obscuretext,
     style: TextStyle(color: hintStyleColor, fontSize: fontSize),
     decoration: InputDecoration(
-        contentPadding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
+        contentPadding: EdgeInsets.symmetric(vertical: 3.0, horizontal: 10.0),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.transparent, width: 0.0),
           borderRadius: BorderRadius.circular(10.0),

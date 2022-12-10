@@ -56,7 +56,6 @@ class _CardBuilderState extends State<CardBuilder> {
         await APICacheManager().addCacheData(cacheDBModel);
 
         List jsonResponse = json.decode(response.body);
-        showSnack('fetching fresh data');
         return jsonResponse.map((card) => new RemCard.fromJson(card)).toList();
       } else if (response.statusCode == 401) {
         invalidateSession();
@@ -98,25 +97,23 @@ class _CardBuilderState extends State<CardBuilder> {
     setState(() {
       data = fetchData();
     });
-    showSnack('REFRESHING DATA');
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: rcAppBarActions("All RemCards", <Widget>[
+        appBar: rcAppBarActions(text:"All RemCards",actions: <Widget>[
           IconButton(
             icon: Icon(Icons.refresh),
             iconSize: 15,
             onPressed: _refresh,
           )
-        ]),
+        ],context: context),
         key: scaffoldKey,
         floatingActionButton: FloatingActionButton(
-          onPressed: ()=>Get.to(()=>AddCardForm()),
+          onPressed: ()=>Get.to(()=>AddCardForm(refresh: refresh,)),
           child: Icon(Icons.add),
         ),
-        backgroundColor: Colors.white,
         body: Container(
           padding: EdgeInsets.only(left: 10.0, right: 10.0),
           child: FutureBuilder<List<RemCard>>(

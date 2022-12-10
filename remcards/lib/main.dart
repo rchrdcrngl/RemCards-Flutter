@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:remcards/pages/add_card.dart';
 import 'package:remcards/pages/card_builder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
@@ -32,16 +30,20 @@ void main() async {
     if (!isAllowed)
       AwesomeNotifications().requestPermissionToSendNotifications();
   });
-  runApp(GetMaterialApp(debugShowCheckedModeBanner: false, home: MyApp()));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "RemCards",
       theme: ThemeData(
+        bottomAppBarColor: Color(0xFF21334a),
+        primaryColor: Color(0xFF385880),
+        backgroundColor: Color(0xFF4a607d),
+        unselectedWidgetColor: Color(0xff788eaa),
         fontFamily: 'Inter',
         textTheme: TextTheme(
           headline1: TextStyle(fontSize: 24.0, fontWeight: FontWeight.w700),

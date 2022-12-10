@@ -33,7 +33,7 @@ class _Settings extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: rcAppBar("Settings"),
+        appBar: rcAppBar(text:"Settings",context: context),
         body: Container(
             padding: EdgeInsets.all(20.0),
             child: ListView(

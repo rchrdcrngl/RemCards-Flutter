@@ -31,12 +31,20 @@ class _RegisterPageState extends State<RegisterPage> {
             : ListView(
                 children: <Widget>[
                   Center(
-                      child: Text("Welcome to RemCards!",
-                          style: TextStyle(
-                              fontFamily: 'Montserrat',
-                              color: Colors.grey[800],
-                              fontWeight: FontWeight.w700,
-                              fontSize: 24))),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset("assets/icon/icon.png", height: 50, fit: BoxFit.contain,),
+                        SizedBox(height: 8,),
+                        Text("Welcome to RemCards!",
+                            style: TextStyle(
+                                color: Colors.teal[600],
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w700,
+                                fontSize: 24)),
+                      ],
+                    ),
+                  ),
                   SizedBox(height: 30.0),
                   RoundedTextField("Username", Colors.blueGrey[900],
                       Colors.blueGrey[200], usernameController, false, 12),
@@ -46,7 +54,23 @@ class _RegisterPageState extends State<RegisterPage> {
                   SizedBox(height: 20.0),
                   RoundedTextField("Password", Colors.blueGrey[900],
                       Colors.blueGrey[200], passwordController, true, 12),
-                  SizedBox(height: 30.0),
+                  errorMsg == null
+                      ? SizedBox(
+                    height: 5,
+                  )
+                      : Container(
+                    height: 30,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "${errorMsg}",
+                        style: TextStyle(
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
@@ -61,35 +85,20 @@ class _RegisterPageState extends State<RegisterPage> {
                         elevation: MaterialStateProperty.all(0)),
                     child: Text("Register",
                         style: TextStyle(
-                            fontFamily: 'Montserrat', color: Colors.white70)),
+                            fontFamily: 'Montserrat', color: Colors.white)),
                   ),
-                  errorMsg == null
-                      ? Container()
-                      : Text(
-                          "${errorMsg}",
-                        ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Already have an account?',
-                    style: TextStyle(
-                      color: Colors.blueAccent,
-                      fontFamily: 'Montserrat',
-                      fontSize: 10,
-                    ),
-                  ),
+                  SizedBox(height: 5.0),
                   ElevatedButton(
                     onPressed: () {
                       Get.back();
                     },
                     style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.all(Colors.purple),
+                            MaterialStateProperty.all(Colors.blueGrey),
                         elevation: MaterialStateProperty.all(0)),
-                    child: Text("Login",
+                    child: Text("Already have an account? Login",
                         style: TextStyle(
-                            fontFamily: 'Montserrat', color: Colors.white70)),
+                            fontFamily: 'Montserrat', color: Colors.white)),
                   )
                 ],
               ),
@@ -98,6 +107,20 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Register(String username, email, pass) async {
+    //Input Validation
+    if(username == "") {
+      setState(()=> {errorMsg = "Username is required!",_isLoading = false});
+      return;
+    }
+    if(pass == "") {
+      setState(()=>{errorMsg = "Password is required!",_isLoading = false});
+      return;
+    }
+    if(email == "") {
+    setState(()=>{errorMsg = "Email is required!",_isLoading = false});
+    return;
+    }
+    //Send request
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     Map data = {
       'username': username,
@@ -124,6 +147,7 @@ class _RegisterPageState extends State<RegisterPage> {
         });
         sharedPreferences.setString("token", jsonResponse['accessToken']);
       }
+      Get.back();
     } else {
       setState(() {
         _isLoading = false;
@@ -131,6 +155,5 @@ class _RegisterPageState extends State<RegisterPage> {
       errorMsg = response.body;
       print("The error message is: ${response.body}");
     }
-    Get.back();
   }
 }

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:remcards/const.dart';
-import 'package:remcards/main.dart';
+import 'package:remcards/pages/components/request_header.dart';
 import 'package:remcards/pages/components/rounded_text_field.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'components/app_bar.dart';
+import 'components/utils.dart';
 
 class editSchedForm extends StatefulWidget {
   final String id;
@@ -16,10 +16,10 @@ class editSchedForm extends StatefulWidget {
   final int minStart;
   final int hourFinish;
   final int minFinish;
-  //final Function refresh;
+  final Function refresh;
 
   editSchedForm(this.day, this.id, this.title, this.hourStart, this.minStart,
-      this.hourFinish, this.minFinish);
+      this.hourFinish, this.minFinish, this.refresh);
   @override
   _editSchedForm createState() => _editSchedForm();
 }
@@ -34,9 +34,9 @@ class _editSchedForm extends State<editSchedForm> {
     _endTime = TimeOfDay(hour: widget.hourFinish, minute: widget.minFinish);
     subject = new TextEditingController(text: widget.title);
     timestart = new TextEditingController(
-        text: widget.hourStart.toString() + ":" + widget.minStart.toString());
+        text: appendZero(widget.hourStart) + ":" + appendZero(widget.minStart));
     timefinished = new TextEditingController(
-        text: widget.hourFinish.toString() + ":" + widget.minFinish.toString());
+        text: appendZero(widget.hourFinish) + ":" + appendZero(widget.minFinish));
   }
 
   Future<Null> _selectStartTime() async {
@@ -49,7 +49,7 @@ class _editSchedForm extends State<editSchedForm> {
       setState(() {
         _startTime = newTime;
         timestart.text =
-            _startTime.hour.toString() + ":" + _startTime.minute.toString();
+            appendZero(_startTime.hour) + ":" + appendZero(_startTime.minute);
       });
     }
     return null;
@@ -65,7 +65,7 @@ class _editSchedForm extends State<editSchedForm> {
       setState(() {
         _endTime = newTime;
         timefinished.text =
-            _endTime.hour.toString() + ":" + _endTime.minute.toString();
+            appendZero(_endTime.hour) + ":" + appendZero(_endTime.minute);
       });
     }
     return null;
@@ -76,9 +76,10 @@ class _editSchedForm extends State<editSchedForm> {
   TextEditingController subject;
   TextEditingController timestart;
   TextEditingController timefinished;
+
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: rcAppBar("Edit Schedule"),
+      appBar: rcAppBar(text: "Edit Schedule", context: context),
       body: Container(
         padding: EdgeInsets.all(20.0),
         child: _isLoading
@@ -86,71 +87,86 @@ class _editSchedForm extends State<editSchedForm> {
             : ListView(
                 children: <Widget>[
                   Text("   Subject Name",
-                      style: TextStyle(color: Colors.lime[900], fontSize: 10)),
+                      style: TextStyle(color: Colors.brown[900], fontSize: 10)),
                   SizedBox(height: 5.0),
-                  RoundedTextField("Subject Name", Colors.lime[900],
-                      Colors.lime[100], subject, false, 12),
+                  RoundedTextField("Subject Name", Colors.brown[900],
+                      Colors.brown[100], subject, false, 12),
                   SizedBox(height: 15.0),
-                  Text("   Start Time",
-                      style: TextStyle(color: Colors.lime[900], fontSize: 10)),
-                  SizedBox(height: 5.0),
-                  TextFormField(
-                      controller: timestart,
-                      onTap: _selectStartTime,
-                      style: TextStyle(color: Colors.lime[900], fontSize: 12),
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 15.0),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.transparent, width: 0.0),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.lightBlueAccent, width: 1.0),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          filled: true,
-                          hintText: "Start Time",
-                          hintStyle: TextStyle(
-                              color: Colors.lime[900].withOpacity(0.5)),
-                          fillColor: Colors.lime[100])),
-                  SizedBox(height: 15.0),
-                  Text("   End Time",
-                      style: TextStyle(color: Colors.lime[900], fontSize: 10)),
-                  SizedBox(height: 5.0),
-                  TextFormField(
-                      controller: timefinished,
-                      onTap: _selectFinishTime,
-                      style: TextStyle(color: Colors.lime[900], fontSize: 12),
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 15.0),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.transparent, width: 0.0),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.lightBlueAccent, width: 1.0),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          filled: true,
-                          hintText: "Finish Time",
-                          hintStyle: TextStyle(
-                              color: Colors.lime[900].withOpacity(0.5)),
-                          fillColor: Colors.lime[100])),
-                  SizedBox(height: 30.0),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(children: [
+                          Text("Start Time",
+                              style: TextStyle(color: Colors.brown[900], fontSize: 10)),
+                          SizedBox(height: 5.0),
+                          TextFormField(
+                              controller: timestart,
+                              readOnly: true,
+                              onTap: _selectStartTime,
+                              style: TextStyle(color: Colors.brown[900], fontSize: 12),
+                              decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(vertical: 3.0, horizontal: 10.0),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.transparent, width: 0.0),
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlueAccent, width: 1.0),
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  filled: true,
+                                  hintText: "Start Time",
+                                  hintStyle: TextStyle(
+                                      color: Colors.brown[900].withOpacity(0.5)),
+                                  fillColor: Colors.brown[100]))],),
+                      ),
+                      SizedBox(width: 10,),
+                      Expanded(
+                        child: Column(children: [
+                          Text("Finish Time",
+                              style: TextStyle(color: Colors.brown[900], fontSize: 10)),
+                          SizedBox(height: 5.0),
+                          TextFormField(
+                              controller: timefinished,
+                              readOnly: true,
+                              onTap: _selectFinishTime,
+                              style: TextStyle(color: Colors.brown[900], fontSize: 12),
+                              decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(vertical: 3.0, horizontal: 10.0),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.transparent, width: 0.0),
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlueAccent, width: 1.0),
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  filled: true,
+                                  hintText: "Finish Time",
+                                  hintStyle: TextStyle(
+                                      color: Colors.brown[900].withOpacity(0.5)),
+                                  fillColor: Colors.brown[100])),
+                        ],),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20.0),
                   ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         setState(() {
                           _isLoading = true;
                         });
-                        editSched(widget.day, widget.id, subject.text,
+                        await editSched(widget.day, widget.id, subject.text,
                             timestart.text, timefinished.text);
-                        Get.offAll(() => MainPage(pageIdx: 1, sRef: true));
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        widget.refresh();
+                        Get.back();
                       },
                       style: ButtonStyle(
                           backgroundColor:
@@ -160,11 +176,16 @@ class _editSchedForm extends State<editSchedForm> {
                           style: TextStyle(color: Colors.teal[700]))),
                   SizedBox(height: 5.0),
                   ElevatedButton(
-                      onPressed: () {
-                        deleteSched(widget.id, widget.day);
-                        //MainPage.of(context).schedRefresh();
-                        //MainPage.of(context).returnAt(1);
-                        Get.offAll(() => MainPage(pageIdx: 1, sRef: true));
+                      onPressed: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        await deleteSched(widget.id, widget.day);
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        widget.refresh();
+                        Get.back();
                       },
                       style: ButtonStyle(
                           backgroundColor:
@@ -186,18 +207,15 @@ class _editSchedForm extends State<editSchedForm> {
 
 editSched(
     int day, String id, String title, String start, String finish) async {
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  String token = sharedPreferences.getString("token");
-  Map<String, String> headers = {
-    'Accept': '*/*',
-    "Access-Control_Allow_Origin": "*",
-    "Content-Type": "application/json",
-    "x-access-token": token,
-  };
-
+  //Data Validation
+  if(title==''||start==''||finish==''){
+    Get.snackbar('Incomplete fields', 'Provide title, day/s, and time period.');
+    return;
+  }
+  //Send POST request
   Map data = {"subject": title, "time": (start + "-" + finish)};
   var response = await http.post(Uri.parse('${schedURI}/${day}/${id}'),
-      headers: headers, body: jsonEncode(data));
+      headers: await getRequestHeaders(), body: jsonEncode(data));
   if (response.statusCode == 204) {
     print("Successful");
   } else {
@@ -207,17 +225,8 @@ editSched(
 }
 
 deleteSched(String id, int day) async {
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  String token = sharedPreferences.getString("token");
-  Map<String, String> headers = {
-    'Accept': '*/*',
-    "Access-Control_Allow_Origin": "*",
-    "Content-Type": "application/json",
-    "x-access-token": token,
-  };
-
   var response = await http.delete(Uri.parse('${schedURI}/${day}/${id}'),
-      headers: headers);
+      headers: await getRequestHeaders());
   if (response.statusCode == 204) {
     print("Successful");
   } else {

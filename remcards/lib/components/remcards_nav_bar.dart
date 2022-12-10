@@ -38,7 +38,7 @@ class _RemCardsNavBarState extends State<RemCardsNavBar> {
               icon: child.icon,
               color: _selectedIndex == i
                   ? Colors.white
-                  : Colors.blueGrey,
+                  : Theme.of(context).unselectedWidgetColor,
               tooltip: child.title,
               onPressed: () {
                 setState(() {

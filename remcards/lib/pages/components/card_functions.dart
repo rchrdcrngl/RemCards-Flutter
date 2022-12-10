@@ -13,10 +13,9 @@ incrementStatus(String id, int tskstat) async {
     "x-access-token": token,
   };
   Map update = {"tskstat": ++tskstat};
-  print(tskstat);
   var response = await http.post(Uri.parse(cardsURI + "/" + id),
       headers: headers, body: jsonEncode(update));
-  if (response.statusCode == 200) {
+  if (response.statusCode == 204) {
     print(response.body);
   } else {
     throw Exception('Failed to load jobs from API');
@@ -34,9 +33,7 @@ deleteCard(String id) async{
   };
   var response = await http.delete(Uri.parse(cardsURI + "/" + id),
       headers: headers);
-  if (response.statusCode == 200) {
-    print(response.body);
-  } else {
+  if (response.statusCode != 200) {
     throw Exception('Failed to load jobs from API');
   }
 }

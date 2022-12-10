@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-AppBar rcAppBar(String text) {
+AppBar rcAppBar({String text, BuildContext context}) {
   return AppBar(
     elevation: 0.0,
-    backgroundColor: Colors.white,
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     iconTheme: IconThemeData(color: Colors.black),
     title: Text(text,
         style: TextStyle(
@@ -12,10 +12,10 @@ AppBar rcAppBar(String text) {
   );
 }
 
-AppBar rcAppBarActions(String text, List<Widget> actions) {
+AppBar rcAppBarActions({String text, List<Widget> actions, BuildContext context}) {
   return AppBar(
     elevation: 0.0,
-    backgroundColor: Colors.white,
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     iconTheme: IconThemeData(color: Colors.black),
     actions: actions,
     title: Text(text,
