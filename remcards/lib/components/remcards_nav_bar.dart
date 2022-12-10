@@ -19,10 +19,10 @@ class _RemCardsNavBarState extends State<RemCardsNavBar> {
       var child = widget.children[i];
       items.add(Expanded(
         child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 7),
+            margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
-              color: _selectedIndex == i ? Colors.amber : Colors.white,
+              color: _selectedIndex == i ? Theme.of(context).primaryColor : Theme.of(context).backgroundColor,
             ),
             child: (child is RemCardsNavBarImageButton)
                 ? TextButton(
@@ -32,15 +32,12 @@ class _RemCardsNavBarState extends State<RemCardsNavBar> {
                   });
                   widget.onTap(i);
                 },
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Image.asset(child.assetURL, height: 50, width: 50,),
-                ))
+                child: Image.asset(child.assetURL, height: 30,))
                 : (child is RemCardsNavBarIconButton)
                 ? IconButton(
               icon: child.icon,
               color: _selectedIndex == i
-                  ? Colors.green
+                  ? Colors.white
                   : Colors.blueGrey,
               tooltip: child.title,
               onPressed: () {
@@ -61,8 +58,8 @@ class _RemCardsNavBarState extends State<RemCardsNavBar> {
     return Container(
       height: 60,
       padding: const EdgeInsets.all(5.0),
-      decoration: const BoxDecoration(
-        color: Colors.blue,
+      decoration: BoxDecoration(
+        color: Theme.of(context).bottomAppBarColor,
       ),
       child: Row(
         children: _items(),

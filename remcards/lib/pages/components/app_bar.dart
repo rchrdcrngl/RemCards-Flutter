@@ -8,7 +8,6 @@ AppBar rcAppBar(String text) {
     title: Text(text,
         style: TextStyle(
             color: Colors.black,
-            fontFamily: 'Montserrat',
             fontWeight: FontWeight.w700)),
   );
 }
@@ -22,7 +21,6 @@ AppBar rcAppBarActions(String text, List<Widget> actions) {
     title: Text(text,
         style: TextStyle(
             color: Colors.black,
-            fontFamily: 'Montserrat',
             fontWeight: FontWeight.w700)),
   );
 }

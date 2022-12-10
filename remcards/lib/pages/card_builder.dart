@@ -11,6 +11,7 @@ import 'package:remcards/pages/components/request_header.dart';
 import 'package:remcards/pages/components/session_handler.dart';
 import 'package:remcards/pages/components/card_functions.dart';
 import 'package:remcards/pages/login.dart';
+import 'add_card.dart';
 import 'components/app_bar.dart';
 import 'components/remcard.dart';
 
@@ -40,7 +41,6 @@ class _CardBuilderState extends State<CardBuilder> {
   void initState(){
     super.initState();
     data = fetchData();
-    showSnack('redraw card builder');
   }
 
   Future<List<RemCard>> fetchData([howMany = 5]) async {
@@ -112,6 +112,10 @@ class _CardBuilderState extends State<CardBuilder> {
           )
         ]),
         key: scaffoldKey,
+        floatingActionButton: FloatingActionButton(
+          onPressed: ()=>Get.to(()=>AddCardForm()),
+          child: Icon(Icons.add),
+        ),
         backgroundColor: Colors.white,
         body: Container(
           padding: EdgeInsets.only(left: 10.0, right: 10.0),

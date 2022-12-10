@@ -63,25 +63,22 @@ class _LoginPageState extends State<LoginPage> {
                             fontFamily: 'Montserrat', color: Colors.white)),
                   ),
                   errorMsg == null
-                      ? Container()
-                      : Text(
-                          "${errorMsg}",
-                          style: TextStyle(
-                            color: Colors.redAccent,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ? SizedBox(
+                          height: 20,
+                        )
+                      : Container(
+                        height: 25,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                              "${errorMsg}",
+                              style: TextStyle(
+                                color: Colors.redAccent,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                         ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Not have an account? Create one...',
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      color: Colors.blueAccent,
-                      fontSize: 10,
-                    ),
-                  ),
+                      ),
                   ElevatedButton(
                     onPressed: () {
                       Get.to(() => RegisterPage());
@@ -90,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                         backgroundColor:
                             MaterialStateProperty.all(Colors.purple),
                         elevation: MaterialStateProperty.all(0)),
-                    child: Text("Register",
+                    child: Text("No Account? Register",
                         style: TextStyle(
                             fontFamily: 'Montserrat', color: Colors.white)),
                   ),
@@ -100,10 +97,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  signIn(String username, pass) async {
+  signIn(String username, String password) async {
     print("signin");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    Map data = {'username': username, 'password': pass};
+    Map data = {'username': username, 'password': password};
     var jsonResponse;
     Map<String, String> headers = {
       'Accept': '*/*',
@@ -114,8 +111,8 @@ class _LoginPageState extends State<LoginPage> {
         headers: headers, body: jsonEncode(data));
     print("DEBUG: login-post");
     print(response);
+    jsonResponse = json.decode(response.body);
     if (response.statusCode == 200) {
-      jsonResponse = json.decode(response.body);
       print(jsonResponse);
       if (jsonResponse != null) {
         setState(() {
@@ -124,15 +121,15 @@ class _LoginPageState extends State<LoginPage> {
         sharedPreferences.setString("token", jsonResponse['accessToken']);
         sharedPreferences.setString("uname", username);
         sharedPreferences.setBool("isProcessed", false);
-        Navigator.of(context).pushAndRemoveUntil(
+        Navigator.pushAndRemoveUntil(context,
             MaterialPageRoute(builder: (BuildContext context) => MainPage()),
-            (Route<dynamic> route) => false);
+                (Route<dynamic> route) => false);
       }
     } else {
       setState(() {
         _isLoading = false;
       });
-      errorMsg = response.body;
+      errorMsg = jsonResponse['message'] ?? 'Error logging in';
       print("The error message is: ${response.body}");
     }
   }

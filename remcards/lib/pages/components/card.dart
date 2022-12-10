@@ -12,6 +12,13 @@ Map<int,Icon> iconMap = {
   3:Icon(Icons.stars_rounded, color: Colors.white),
   4:Icon(Icons.check_circle_rounded, color: Colors.white)};
 
+Map<int,String> statusMap = {
+  0:"Not yet started",
+  1:"Started",
+  2:"Ongoing",
+  3:"Needs Attention",
+  4:"Finished"};
+
 Map<int,Color> color = {
   0: Color(0xFF2980b9),
   1: Color(0xFFf1c40f),
@@ -42,30 +49,42 @@ Widget RCard({RemCard remcard, BuildContext context, Function deleteCard, Functi
                   padding: EdgeInsets.all(10),
                   child: Row(
                     children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(remcard.tskdesc,
-                              style: TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.w700)),
-                          Text(remcard.subjcode,
-                              style: TextStyle(fontFamily: 'Montserrat')),
-                          Text(remcard.tskdate,
-                              style: TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.w300))
-                        ],
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(remcard.tskdesc,
+                                style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.w700)),
+                            Text(remcard.subjcode,
+                                style: TextStyle(fontFamily: 'Montserrat')),
+                            Text(remcard.tskdate,
+                                style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.w300))
+                          ],
+                        ),
                       ),
+                      SizedBox(width: 8,),
                       ElevatedButton(
                         onPressed: () {
                           incrementStatus(remcard.id, remcard.tskstat);
                           refresh();
                         },
-                        child: iconMap[remcard.tskstat]??Icon(Icons.adjust_rounded, color: Colors.white),
+                        child: Padding(
+                          padding: EdgeInsets.all(2),
+                          child: Row(
+                            children: [
+                              iconMap[remcard.tskstat]??Icon(Icons.adjust_rounded, color: Colors.white),
+                              SizedBox(width: 3,),
+                              Text(statusMap[remcard.tskstat]??"Not yet started"),
+                            ],
+                          ),
+                        ),
                         style: ButtonStyle(
-                          shape: MaterialStateProperty.all(CircleBorder()),
+                          shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0),)),
                           padding: MaterialStateProperty.all(EdgeInsets.all(5)),
                           backgroundColor: MaterialStateProperty.all(
                               color[remcard.tsklvl]??Color(0xFF2980b9)), // <-- Button color

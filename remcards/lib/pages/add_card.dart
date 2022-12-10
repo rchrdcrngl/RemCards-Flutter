@@ -8,16 +8,17 @@ import 'package:remcards/pages/components/rounded_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 import 'components/app_bar.dart';
+import 'package:get/get.dart';
 
-class addCardForm extends StatefulWidget {
+class AddCardForm extends StatefulWidget {
   final Function refresh;
 
-  const addCardForm({Key key, this.refresh}) : super(key: key);
+  const AddCardForm({Key key, this.refresh}) : super(key: key);
   @override
-  _addCardForm createState() => _addCardForm();
+  _AddCardForm createState() => _AddCardForm();
 }
 
-class _addCardForm extends State<addCardForm> {
+class _AddCardForm extends State<AddCardForm> {
   bool _isLoading = false;
   var errorMsg;
   DateTime date;
@@ -114,8 +115,7 @@ class _addCardForm extends State<addCardForm> {
                         });
                         addCard(subjectCode.text, taskDesc.text, taskDate.text,
                             dropdownvalue);
-                        MainPage.of(context).cardsRefresh();
-                        MainPage.of(context).returnAt(0);
+                        Get.back();
                       },
                       style: ButtonStyle(
                           backgroundColor:
@@ -170,6 +170,7 @@ addCard(String subjcode, String tskdesc, String tskdate, String tsklvl) async {
   if (response.statusCode == 201) {
     print("Successful");
     var date = tskdate.split("/");
+    print(date);
     createReminderNotification(subjcode, tskdesc, int.parse(date[0]),
         int.parse(date[1]), int.parse(date[2]));
   } else {

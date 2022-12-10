@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:remcards/pages/AddCard.dart';
+import 'package:remcards/pages/add_card.dart';
 import 'package:remcards/pages/card_builder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
+import 'components/remcards_nav_bar.dart';
 import 'pages/Login.dart';
 import 'pages/Schedule.dart';
 import 'pages/Settings.dart';
@@ -41,7 +42,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: "RemCards",
       theme: ThemeData(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Inter',
         textTheme: TextTheme(
           headline1: TextStyle(fontSize: 24.0, fontWeight: FontWeight.w700),
           bodyText1: TextStyle(fontSize: 12.0),
@@ -87,14 +88,14 @@ class _MainPageState extends State<MainPage> {
     returnAt(widget.pageIdx);
 
     //NOTIFICATION
-    AwesomeNotifications().actionStream.listen((notification) {
-      if (notification.channelKey == 'basic_channel' && Platform.isIOS) {
-        AwesomeNotifications().getGlobalBadgeCounter().then(
-              (value) =>
-                  AwesomeNotifications().setGlobalBadgeCounter(value - 1),
-            );
-      }
-    });
+
+
+    //Set Pages
+    _widgetOptions = <Widget>[
+      CardBuilder(),
+      SchedulePage(),
+      Settings(),
+    ];
   }
 
   returnAt(int idx) {
@@ -126,12 +127,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   int _selectedIndex = 0;
-  List<Widget> _widgetOptions = <Widget>[
-    CardBuilder(),
-    SchedulePage(),
-    addCardForm(),
-    Settings(),
-  ];
+  List<Widget> _widgetOptions = [];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -143,34 +139,12 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _widgetOptions.elementAt(_selectedIndex),
-      bottomNavigationBar: ClipRRect(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(5.0), topRight: Radius.circular(5.0)),
-          child: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.view_day_rounded, size: 20.0),
-                  label: 'RemCards',
-                  backgroundColor: Colors.purple),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.calendar_today, size: 20.0),
-                  label: 'Schedule',
-                  backgroundColor: Colors.orange),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.add_circle_outlined, size: 20.0),
-                label: 'Add Card',
-                backgroundColor: Colors.green,
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.settings, size: 20.0),
-                  label: 'Settings',
-                  backgroundColor: Colors.blue),
-            ],
-            currentIndex: _selectedIndex,
-            showSelectedLabels: false,
-            backgroundColor: Colors.deepPurple[50],
-            onTap: _onItemTapped,
-          )),
+      bottomNavigationBar: RemCardsNavBar(onTap: (idx) { _onItemTapped(idx); },
+    children: [
+      RemCardsNavBarImageButton(title: 'RemCards', assetURL: 'assets/icon/icon.png'),
+      RemCardsNavBarIconButton(title: 'Schedule', icon: const Icon(Icons.calendar_today_outlined)),
+      RemCardsNavBarIconButton(title: 'Settings', icon: const Icon(Icons.settings)),
+    ]),
     );
   }
 }

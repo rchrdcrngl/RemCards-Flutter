@@ -31,7 +31,7 @@ List<LaneEvents> ScheduleHeader(width) {
         ),
         LaneEvents(
           lane: Lane(
-              name: 'THURS',
+              name: 'THU',
               width: (width / 8),
               textStyle: TextStyle(color: Colors.brown, fontSize: 10)),
           events: [],
