@@ -127,8 +127,6 @@ class _RegisterPageState extends State<RegisterPage> {
       'email': email,
       'password': pass,
       'roles': ["user"],
-      'data': [],
-      'schedule': []
     };
     var jsonResponse;
     Map<String, String> headers = {
